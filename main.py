@@ -1,4 +1,3 @@
-# Append this to your `main.py`
 import streamlit as st
 import methods
 import uuid
@@ -10,7 +9,7 @@ page = st.sidebar.radio("Navigate", ["Lead Scoring", "Available Rooms Dashboard"
 
 # Lead Scoring Page
 if page == "Lead Scoring":
-    st.title("📡 Smart Routing - Lead Intake")
+    st.title("\U0001F4E1 Smart Routing - Lead Intake")
     with st.form("lead_form"):
         lead_id = str(uuid.uuid4())
         budget = st.number_input("Your Budget (RM)", min_value=0, step=0, format="%d")
@@ -44,7 +43,7 @@ if page == "Lead Scoring":
 
 # Available Rooms Dashboard
 elif page == "Available Rooms Dashboard":
-    st.title("🏘️ Property Availability Dashboard")
+    st.title("\U0001F3D8️ Property Availability Dashboard")
     for prop in methods.properties:
         st.header(f"{prop['name']} — {prop['location']}")
         for unit in prop["units"]:
@@ -55,7 +54,7 @@ elif page == "Available Rooms Dashboard":
 
 # Agent Load & Status
 elif page == "Agent Load & Status":
-    st.title("👥 Agent Load & Status Overview")
+    st.title("\U0001F465 Agent Load & Status Overview")
     agents = methods.get_all_agents()
 
     st.markdown("""
@@ -80,6 +79,7 @@ elif page == "Agent Load & Status":
             """, unsafe_allow_html=True)
         with col2:
             if st.button(f"Reset {agent['name']}"):
-                st.session_state["refresh"] = True
-                st.rerun()
-                st.markdown("<hr>", unsafe_allow_html=True)
+                methods.reset_agent_load(agent['name'])
+                st.session_state["just_reset"] = True
+                st.experimental_rerun()
+        st.markdown("<hr>", unsafe_allow_html=True)
