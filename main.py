@@ -30,10 +30,10 @@ if page == "Lead Scoring":
             agent = methods.assign_highest_tier()
             queue = "Senior Agent Queue"
         elif score >= 40:
-            agent = methods.assign("Regular Agent Queue")
+            agent = methods.assign_most_available("Top")
             queue = "Regular Agent Queue"
         else:
-            agent = methods.assign("General Inquiry Queue")
+            agent = methods.assign_most_available("Top")
             queue = "General Inquiry Queue"
 
         st.success("Lead Processed")
