@@ -151,3 +151,11 @@ def calculate_alps_score(budget, move_in, location, contact, room_type, user_typ
     score += room_type_score(location, room_type)
     score += user_type_bonus(user_type)
     return round(min(score, 100), 2)
+
+def reset_agent_load(agent_name):
+    for agent in AGENT_POOL:
+        if agent["name"] == agent_name:
+            agent["load"] = 0
+            update_agent_status(agent)
+            break
+
