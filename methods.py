@@ -17,7 +17,7 @@ AGENT_POOL = [
 # -------------------------------
 def assign_by_tier_priority(tiers):
     for tier in tiers:
-        available = [a for a in AGENT_POOL if a["tier"] == tier and a["load"] < a["max_load"]]
+        available = [a for a in AGENT_POOL if a["tier"].lower() == tier.lower() and a["load"] < a["max_load"]]
         if available:
             agent = sorted(available, key=lambda x: x["load"])[0]
             agent["load"] += 1
