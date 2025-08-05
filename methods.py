@@ -127,3 +127,85 @@ def calculate_alps_score(budget, move_in, location, contact, room_type, user_typ
     score += room_type_score(location, room_type)
     score += user_type_bonus(user_type)
     return round(min(score, 100), 2)
+
+# Extend methods.py with agent backend logic matching UI
+
+# -------------------------------
+# Agent Profiles (Matches Visuals)
+# -------------------------------
+agent_profiles = [
+    {
+        "id": "Agent_S1",
+        "name": "Emma Wilson",
+        "tier": "Top",
+        "role": "Property Specialist",
+        "load": 3,
+        "max_load": 10,
+        "status": "available"
+    },
+    {
+        "id": "Agent_R1",
+        "name": "David Chen",
+        "tier": "Regular",
+        "role": "Sales Consultant",
+        "load": 7,
+        "max_load": 10,
+        "status": "busy"
+    },
+    {
+        "id": "Agent_R2",
+        "name": "Sarah Johnson",
+        "tier": "Regular",
+        "role": "Customer Relations",
+        "load": 8,
+        "max_load": 10,
+        "status": "busy"
+    },
+    {
+        "id": "Agent_R3",
+        "name": "Alex Rodriguez",
+        "tier": "Regular",
+        "role": "Leasing Agent",
+        "load": 10,
+        "max_load": 10,
+        "status": "full"
+    },
+    {
+        "id": "Agent_G1",
+        "name": "Olivia Martinez",
+        "tier": "Junior",
+        "role": "Junior Agent",
+        "load": 2,
+        "max_load": 5,
+        "status": "available"
+    }
+]
+
+# -------------------------------
+# Agent API Accessors
+# -------------------------------
+def get_all_agents():
+    return agent_profiles
+
+def get_agent_by_id(agent_id):
+    return next((a for a in agent_profiles if a["id"] == agent_id), None)
+
+def assign_lead_to_agent(agent_id):
+    agent = get_agent_by_id(agent_id)
+    if not agent:
+        return False, "Agent not found"
+    if agent["load"] >= agent["max_load"]:
+        return False, "Agent at full capacity"
+    agent["load"] += 1
+    update_agent_status(agent)
+    return True, agent
+
+def update_agent_status(agent):
+    ratio = agent["load"] / agent["max_load"]
+    if ratio >= 1.0:
+        agent["status"] = "full"
+    elif ratio >= 0.6:
+        agent["status"] = "busy"
+    else:
+        agent["status"] = "available"
+
