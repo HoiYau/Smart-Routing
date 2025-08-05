@@ -131,90 +131,58 @@ def calculate_alps_score(budget, move_in, location, contact, room_type, user_typ
 # Extend methods.py with agent backend logic matching UI
 
 # -------------------------------
-# Agent Profiles (Matches Visuals)
+# Agent Profiles for Simulation
 # -------------------------------
-agent_profiles = [
-    {
-        "id": "Agent_S1",
-        "name": "Emma Wilson",
-        "tier": "Top",
-        "role": "Property Specialist",
-        "load": 3,
-        "max_load": 10,
-        "status": "available"
-    },
-    {
-        "id": "Agent_R1",
-        "name": "David Chen",
-        "tier": "Regular",
-        "role": "Sales Consultant",
-        "load": 7,
-        "max_load": 10,
-        "status": "busy"
-    },
-    {
-        "id": "Agent_R2",
-        "name": "Sarah Johnson",
-        "tier": "Regular",
-        "role": "Customer Relations",
-        "load": 8,
-        "max_load": 10,
-        "status": "busy"
-    },
-    {
-        "id": "Agent_R3",
-        "name": "Alex Rodriguez",
-        "tier": "Regular",
-        "role": "Leasing Agent",
-        "load": 10,
-        "max_load": 10,
-        "status": "full"
-    },
-    {
-        "id": "Agent_G1",
-        "name": "Olivia Martinez",
-        "tier": "Junior",
-        "role": "Junior Agent",
-        "load": 2,
-        "max_load": 5,
-        "status": "available"
-    }
+AGENT_POOL = [
+    {"id": "Agent_S1", "name": "Emma Wilson", "role": "Property Specialist", "tier": "Top", "load": 0, "max_load": 5},
+    {"id": "Agent_R1", "name": "David Chen", "role": "Sales Consultant", "tier": "Regular", "load": 0, "max_load": 5},
+    {"id": "Agent_R2", "name": "Sarah Johnson", "role": "Customer Relations", "tier": "Regular", "load": 0, "max_load": 5},
+    {"id": "Agent_R3", "name": "Alex Rodriguez", "role": "Leasing Agent", "tier": "Regular", "load": 0, "max_load": 5},
+    {"id": "Agent_G1", "name": "Olivia Martinez", "role": "Junior Agent", "tier": "Junior", "load": 0, "max_load": 5},
 ]
 
-# -------------------------------
-# Agent API Accessors
-# -------------------------------
-def get_all_agents():
-    return agent_profiles
+def assign_highest_tier():
+    for agent in AGENT_POOL:
+        if agent["tier"] == "Top" and agent["load"] < agent["max_load"]:
+            agent["load"] += 1
+            update_agent_status(agent)
+            return agent["name"]
+    for agent in AGENT_POOL:
+        if agent["tier"] == "Regular" and agent["load"] < agent["max_load"]:
+            agent["load"] += 1
+            update_agent_status(agent)
+            return agent["name"]
+    return None
 
-def get_agent_by_id(agent_id):
-    return next((a for a in agent_profiles if a["id"] == agent_id), None)
-
-def assign_lead_to_agent(agent_id):
-    agent = get_agent_by_id(agent_id)
-    if not agent:
-        return False, "Agent not found"
-    if agent["load"] >= agent["max_load"]:
-        return False, "Agent at full capacity"
-    agent["load"] += 1
-    update_agent_status(agent)
-    return True, agent
+def assign(queue_name):
+    tier = "Regular" if queue_name == "Regular Agent Queue" else "Junior"
+    for agent in AGENT_POOL:
+        if agent["tier"] == tier and agent["load"] < agent["max_load"]:
+            agent["load"] += 1
+            update_agent_status(agent)
+            return agent["name"]
+    return None
 
 def update_agent_status(agent):
     ratio = agent["load"] / agent["max_load"]
     if ratio >= 1.0:
-        agent["status"] = "full"
+        agent["status"] = "At Capacity"
     elif ratio >= 0.6:
-        agent["status"] = "busy"
+        agent["status"] = "Busy"
     else:
-        agent["status"] = "available"
+        agent["status"] = "Available"
 
 def get_all_agents():
+    for agent in AGENT_POOL:
+        update_agent_status(agent)
     return [
-        {"name": "Emma Wilson", "role": "Property Specialist", "tier": "Top", "load": 3, "max_load": 10, "status": "Available"},
-        {"name": "David Chen", "role": "Sales Consultant", "tier": "Regular", "load": 7, "max_load": 10, "status": "Busy"},
-        {"name": "Sarah Johnson", "role": "Customer Relations", "tier": "Regular", "load": 8, "max_load": 10, "status": "Busy"},
-        {"name": "Alex Rodriguez", "role": "Leasing Agent", "tier": "Regular", "load": 10, "max_load": 10, "status": "At Capacity"},
-        {"name": "Olivia Martinez", "role": "Junior Agent", "tier": "Junior", "load": 2, "max_load": 5, "status": "Available"},
+        {
+            "name": agent["name"],
+            "role": agent["role"],
+            "tier": agent["tier"],
+            "load": agent["load"],
+            "max_load": agent["max_load"],
+            "status": agent.get("status", "Available")
+        }
+        for agent in AGENT_POOL
     ]
-
