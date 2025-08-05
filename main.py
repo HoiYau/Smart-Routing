@@ -8,7 +8,7 @@ import methods  # make sure methods.py is in the same directory
 # Streamlit UI - Page Control
 # -------------------------------
 st.set_page_config(page_title="Smart Routing App", layout="wide")
-page = st.sidebar.radio("Navigate", ["Lead Scoring", "Available Rooms Dashboard"])
+page = st.sidebar.radio("Navigate", ["Lead Scoring", "Available Rooms Dashboard", "Agent Load & Status"])
 
 if page == "Lead Scoring":
     st.title("📡 Smart Routing - Lead Intake")
@@ -43,3 +43,27 @@ elif page == "Available Rooms Dashboard":
                 for idx, room in enumerate(unit["rooms"]):
                     status = "✅ Available" if not room["occupied"] else "❌ Rented"
                     st.markdown(f"**Room {idx+1}**: {room['type']} - RM{room['price']} — {status}")
+
+elif page == "Agent Load & Status":
+    st.title("👥 Agent Load & Status Overview")
+    agents = methods.get_all_agents()
+
+    st.markdown("""
+        <style>
+        .status-green { color: green; font-weight: bold; }
+        .status-yellow { color: orange; font-weight: bold; }
+        .status-red { color: red; font-weight: bold; }
+        </style>
+    """, unsafe_allow_html=True)
+
+    st.write("### Agent Roster")
+    for agent in agents:
+        color = "status-green" if agent['status'] == "Available" else "status-yellow" if agent['status'] == "Busy" else "status-red"
+        st.markdown(f"""
+        **{agent['name']}**  
+        Role: {agent['role']} | Tier: {agent['tier']}  
+        Load: {agent['load']}/{agent['max_load']}  
+        Status: <span class='{color}'>{agent['status']}</span>
+        <hr>
+        """, unsafe_allow_html=True)
+
