@@ -1,15 +1,14 @@
-# main.py — Streamlit UI using methods.py
+# Append this to your `main.py`
 import streamlit as st
+import methods
 import uuid
 from datetime import datetime
-import methods  # make sure methods.py is in the same directory
 
-# -------------------------------
-# Streamlit UI - Page Control
-# -------------------------------
+# Add new page in sidebar
 st.set_page_config(page_title="Smart Routing App", layout="wide")
 page = st.sidebar.radio("Navigate", ["Lead Scoring", "Available Rooms Dashboard", "Agent Load & Status"])
 
+# Lead Scoring Page
 if page == "Lead Scoring":
     st.title("📡 Smart Routing - Lead Intake")
     with st.form("lead_form"):
@@ -25,8 +24,17 @@ if page == "Lead Scoring":
 
     if submitted:
         score = methods.calculate_alps_score(budget, move_in_date, location, contact_provided, bedroom_type, user_type)
-        queue = methods.route(score)
-        agent = methods.assign(queue)
+
+        # Smart agent assignment simulation
+        if score >= 70:
+            agent = methods.assign_highest_tier()
+            queue = "Senior Agent Queue"
+        elif score >= 40:
+            agent = methods.assign("Regular Agent Queue")
+            queue = "Regular Agent Queue"
+        else:
+            agent = methods.assign("General Inquiry Queue")
+            queue = "General Inquiry Queue"
 
         st.success("Lead Processed")
         st.write(f"**Lead ID:** {lead_id}")
@@ -34,6 +42,7 @@ if page == "Lead Scoring":
         st.write(f"**Assigned Queue:** {queue}")
         st.write(f"**Assigned Agent:** {agent if agent else 'None Available'}")
 
+# Available Rooms Dashboard
 elif page == "Available Rooms Dashboard":
     st.title("🏘️ Property Availability Dashboard")
     for prop in methods.properties:
@@ -44,6 +53,7 @@ elif page == "Available Rooms Dashboard":
                     status = "✅ Available" if not room["occupied"] else "❌ Rented"
                     st.markdown(f"**Room {idx+1}**: {room['type']} - RM{room['price']} — {status}")
 
+# Agent Load & Status
 elif page == "Agent Load & Status":
     st.title("👥 Agent Load & Status Overview")
     agents = methods.get_all_agents()
@@ -66,4 +76,3 @@ elif page == "Agent Load & Status":
         Status: <span class='{color}'>{agent['status']}</span>
         <hr>
         """, unsafe_allow_html=True)
-
