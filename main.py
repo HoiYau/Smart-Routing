@@ -69,10 +69,17 @@ elif page == "Agent Load & Status":
     st.write("### Agent Roster")
     for agent in agents:
         color = "status-green" if agent['status'] == "Available" else "status-yellow" if agent['status'] == "Busy" else "status-red"
-        st.markdown(f"""
-        **{agent['name']}**  
-        Role: {agent['role']} | Tier: {agent['tier']}  
-        Load: {agent['load']}/{agent['max_load']}  
-        Status: <span class='{color}'>{agent['status']}</span>
-        <hr>
-        """, unsafe_allow_html=True)
+
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.markdown(f"""
+            **{agent['name']}**  
+            Role: {agent['role']} | Tier: {agent['tier']}  
+            Load: {agent['load']}/{agent['max_load']}  
+            Status: <span class='{color}'>{agent['status']}</span>
+            """, unsafe_allow_html=True)
+        with col2:
+            if st.button(f"Reset {agent['name']}"):
+                methods.reset_agent_load(agent['name'])
+                st.experimental_rerun()
+        st.markdown("<hr>", unsafe_allow_html=True)
