@@ -1,6 +1,54 @@
 # methods.py — Smart Routing Logic & Scoring Utilities
-import itertools
 from datetime import datetime
+
+# -------------------------------
+# Agent Profiles for Simulation
+# -------------------------------
+AGENT_POOL = [
+    {"id": "Agent_S1", "name": "Emma Wilson", "role": "Property Specialist", "tier": "Top", "load": 0, "max_load": 5},
+    {"id": "Agent_R1", "name": "David Chen", "role": "Sales Consultant", "tier": "Regular", "load": 0, "max_load": 5},
+    {"id": "Agent_R2", "name": "Sarah Johnson", "role": "Customer Relations", "tier": "Regular", "load": 0, "max_load": 5},
+    {"id": "Agent_R3", "name": "Alex Rodriguez", "role": "Leasing Agent", "tier": "Regular", "load": 0, "max_load": 5},
+    {"id": "Agent_G1", "name": "Olivia Martinez", "role": "Junior Agent", "tier": "Junior", "load": 0, "max_load": 5},
+]
+
+# -------------------------------
+# Tiered Assignment Logic
+# -------------------------------
+def assign_by_tier_priority(tiers):
+    for tier in tiers:
+        available = [a for a in AGENT_POOL if a["tier"] == tier and a["load"] < a["max_load"]]
+        if available:
+            agent = sorted(available, key=lambda x: x["load"])[0]
+            agent["load"] += 1
+            update_agent_status(agent)
+            return agent["name"]
+    return None
+
+def update_agent_status(agent):
+    ratio = agent["load"] / agent["max_load"]
+    if ratio >= 1.0:
+        agent["status"] = "At Capacity"
+    elif ratio >= 0.6:
+        agent["status"] = "Busy"
+    else:
+        agent["status"] = "Available"
+
+def get_all_agents():
+    for agent in AGENT_POOL:
+        update_agent_status(agent)
+    return [
+        {
+            "name": agent["name"],
+            "role": agent["role"],
+            "tier": agent["tier"],
+            "load": agent["load"],
+            "max_load": agent["max_load"],
+            "status": agent.get("status", "Available")
+        }
+        for agent in AGENT_POOL
+    ]
+
 # -------------------------------
 # Static Property & Room Data
 # -------------------------------
@@ -103,72 +151,3 @@ def calculate_alps_score(budget, move_in, location, contact, room_type, user_typ
     score += room_type_score(location, room_type)
     score += user_type_bonus(user_type)
     return round(min(score, 100), 2)
-
-# Extend methods.py with agent backend logic matching UI
-
-# -------------------------------
-# Agent Profiles for Simulation
-# -------------------------------
-AGENT_POOL = [
-    {"id": "Agent_S1", "name": "Emma Wilson", "role": "Property Specialist", "tier": "Top", "load": 0, "max_load": 5},
-    {"id": "Agent_R1", "name": "David Chen", "role": "Sales Consultant", "tier": "Regular", "load": 0, "max_load": 5},
-    {"id": "Agent_R2", "name": "Sarah Johnson", "role": "Customer Relations", "tier": "Regular", "load": 0, "max_load": 5},
-    {"id": "Agent_R3", "name": "Alex Rodriguez", "role": "Leasing Agent", "tier": "Regular", "load": 0, "max_load": 5},
-    {"id": "Agent_G1", "name": "Olivia Martinez", "role": "Junior Agent", "tier": "Junior", "load": 0, "max_load": 5},
-]
-
-def assign_highest_tier():
-    for agent in AGENT_POOL:
-        if agent["tier"] == "Top" and agent["load"] < agent["max_load"]:
-            agent["load"] += 1
-            update_agent_status(agent)
-            return agent["name"]
-    for agent in AGENT_POOL:
-        if agent["tier"] == "Regular" and agent["load"] < agent["max_load"]:
-            agent["load"] += 1
-            update_agent_status(agent)
-            return agent["name"]
-    return None
-
-def assign(queue_name):
-    tier = "Regular" if queue_name == "Regular Agent Queue" else "Junior"
-    for agent in AGENT_POOL:
-        if agent["tier"] == tier and agent["load"] < agent["max_load"]:
-            agent["load"] += 1
-            update_agent_status(agent)
-            return agent["name"]
-    return None
-
-def update_agent_status(agent):
-    ratio = agent["load"] / agent["max_load"]
-    if ratio >= 1.0:
-        agent["status"] = "At Capacity"
-    elif ratio >= 0.6:
-        agent["status"] = "Busy"
-    else:
-        agent["status"] = "Available"
-
-def get_all_agents():
-    for agent in AGENT_POOL:
-        update_agent_status(agent)
-    return [
-        {
-            "name": agent["name"],
-            "role": agent["role"],
-            "tier": agent["tier"],
-            "load": agent["load"],
-            "max_load": agent["max_load"],
-            "status": agent.get("status", "Available")
-        }
-        for agent in AGENT_POOL
-    ]
-
-def assign_most_available(tier):
-    available_agents = [a for a in AGENT_POOL if a["tier"] == tier and a["load"] < a["max_load"]]
-    if not available_agents:
-        return None
-    # Sort by fewest load
-    agent = sorted(available_agents, key=lambda x: x["load"])[0]
-    agent["load"] += 1
-    update_agent_status(agent)
-    return agent["name"]
