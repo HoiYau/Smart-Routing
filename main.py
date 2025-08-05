@@ -81,5 +81,4 @@ elif page == "Agent Load & Status":
         with col2:
             if st.button(f"Reset {agent['name']}"):
                 methods.reset_agent_load(agent['name'])
-                st.experimental_rerun()
         st.markdown("<hr>", unsafe_allow_html=True)
