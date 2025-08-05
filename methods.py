@@ -37,7 +37,6 @@ properties = [
         ]},
         {"unit_id": "Unit-2", "rooms": [
             {"type": "Master Room", "price": 1200, "occupied": True},
-            {"type": "Small Room", "price": 450, "occupied": False},
             {"type": "Medium Room", "price": 700, "occupied": False},
         ]},
         {"unit_id": "Unit-3", "rooms": [
@@ -47,24 +46,6 @@ properties = [
         {"unit_id": "Unit-4", "rooms": [
             {"type": "Master Room", "price": 1000, "occupied": False},
             {"type": "Medium Room", "price": 800, "occupied": True},
-        ]},
-    ]},
-    {"name": "Menara Rajawali Condominium", "location": "Wangsa Maju", "units": [
-        {"unit_id": "Unit-1", "rooms": [
-            {"type": "Small Room", "price": 500, "occupied": False},
-            {"type": "Small Room", "price": 400, "occupied": True},
-        ]},
-        {"unit_id": "Unit-2", "rooms": [
-            {"type": "Medium Room", "price": 850, "occupied": False},
-            {"type": "Medium Room", "price": 750, "occupied": True},
-        ]},
-        {"unit_id": "Unit-3", "rooms": [
-            {"type": "Master Room", "price": 1100, "occupied": True},
-            {"type": "Small Room", "price": 450, "occupied": False},
-        ]},
-        {"unit_id": "Unit-4", "rooms": [
-            {"type": "Medium Room", "price": 700, "occupied": True},
-            {"type": "Master Room", "price": 950, "occupied": False},
         ]},
     ]},
     {"name": "MH2 Platinium", "location": "Setapak", "units": [
@@ -85,7 +66,7 @@ properties = [
             {"type": "Medium Room", "price": 700, "occupied": True},
         ]},
     ]},
-    {"name": "The Hamilton", "location": "Setapak", "units": [
+    {"name": "The Hamilton", "location": "Wangsa Maju", "units": [
         {"unit_id": "Unit-1", "rooms": [
             {"type": "Master Room", "price": 1200, "occupied": False},
             {"type": "Small Room", "price": 400, "occupied": False},
