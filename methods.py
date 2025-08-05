@@ -209,3 +209,12 @@ def update_agent_status(agent):
     else:
         agent["status"] = "available"
 
+def get_all_agents():
+    return [
+        {"name": "Emma Wilson", "role": "Property Specialist", "tier": "Top", "load": 3, "max_load": 10, "status": "Available"},
+        {"name": "David Chen", "role": "Sales Consultant", "tier": "Regular", "load": 7, "max_load": 10, "status": "Busy"},
+        {"name": "Sarah Johnson", "role": "Customer Relations", "tier": "Regular", "load": 8, "max_load": 10, "status": "Busy"},
+        {"name": "Alex Rodriguez", "role": "Leasing Agent", "tier": "Regular", "load": 10, "max_load": 10, "status": "At Capacity"},
+        {"name": "Olivia Martinez", "role": "Junior Agent", "tier": "Junior", "load": 2, "max_load": 5, "status": "Available"},
+    ]
+
