@@ -80,4 +80,6 @@ elif page == "Agent Load & Status":
             """, unsafe_allow_html=True)
         with col2:
             if st.button(f"Reset {agent['name']}"):
-        st.markdown("<hr>", unsafe_allow_html=True)
+                st.session_state["refresh"] = True
+                st.rerun()
+                st.markdown("<hr>", unsafe_allow_html=True)
