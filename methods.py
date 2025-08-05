@@ -1,30 +1,6 @@
 # methods.py — Smart Routing Logic & Scoring Utilities
 import itertools
 from datetime import datetime
-
-# -------------------------------
-# Agent Setup & Routing Logic
-# -------------------------------
-AGENTS = {
-    "Senior Agent Queue": ["Agent_S1", "Agent_S2"],
-    "Regular Agent Queue": ["Agent_R1", "Agent_R2", "Agent_R3"],
-    "General Inquiry Queue": ["Agent_G1", "Agent_G2"]
-}
-agent_status = {aid: {"status": "online", "active": 0, "max": 5} for q in AGENTS.values() for aid in q}
-agent_cycles = {q: itertools.cycle(AGENTS[q]) for q in AGENTS}
-
-def route(score):
-    return "Senior Agent Queue" if score >= 70 else "Regular Agent Queue" if score >= 40 else "General Inquiry Queue"
-
-def assign(queue):
-    for _ in range(len(AGENTS[queue])):
-        aid = next(agent_cycles[queue])
-        a = agent_status[aid]
-        if a["status"] == "online" and a["active"] < a["max"]:
-            a["active"] += 1
-            return aid
-    return None
-
 # -------------------------------
 # Static Property & Room Data
 # -------------------------------
@@ -186,3 +162,13 @@ def get_all_agents():
         }
         for agent in AGENT_POOL
     ]
+
+def assign_most_available(tier):
+    available_agents = [a for a in AGENT_POOL if a["tier"] == tier and a["load"] < a["max_load"]]
+    if not available_agents:
+        return None
+    # Sort by fewest load
+    agent = sorted(available_agents, key=lambda x: x["load"])[0]
+    agent["load"] += 1
+    update_agent_status(agent)
+    return agent["name"]
