@@ -55,7 +55,6 @@ properties = [
         ]},
         {"unit_id": "Unit-2", "rooms": [
             {"type": "Small Room", "price": 400, "occupied": True},
-            {"type": "Small Room", "price": 450, "occupied": False},
         ]},
         {"unit_id": "Unit-3", "rooms": [
             {"type": "Small Room", "price": 500, "occupied": True},
