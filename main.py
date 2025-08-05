@@ -25,15 +25,15 @@ if page == "Lead Scoring":
     if submitted:
         score = methods.calculate_alps_score(budget, move_in_date, location, contact_provided, bedroom_type, user_type)
 
-        # Smart agent assignment simulation
+        # Advanced assignment with fallback by tier and balance within tier
         if score >= 70:
-            agent = methods.assign_highest_tier()
+            agent = methods.assign_by_tier_priority(["Top", "Regular", "Junior"])
             queue = "Senior Agent Queue"
         elif score >= 40:
-            agent = methods.assign_most_available("Top")
+            agent = methods.assign_by_tier_priority(["Regular", "Junior"])
             queue = "Regular Agent Queue"
         else:
-            agent = methods.assign_most_available("Top")
+            agent = methods.assign_by_tier_priority(["Junior"])
             queue = "General Inquiry Queue"
 
         st.success("Lead Processed")
