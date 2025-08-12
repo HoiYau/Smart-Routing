@@ -44,7 +44,12 @@ if page == "Lead Scoring":
         if reset_after_submit:
             for a in methods.AGENT_POOL:
                 methods.reset_agent_load(a["name"])
-            st.info("Agent loads have been reset.")
+            methods.SHARED_TIER_QUOTA.update({
+                "Top": 4,
+                "Senior": 3,
+                "Junior": 2
+            })
+            st.info("Agent loads and tier quotas have been reset.")
 
 # Available Rooms Dashboard
 elif page == "Available Rooms Dashboard":
