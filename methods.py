@@ -105,7 +105,61 @@ def reset_agent_load(agent_name):
 # -------------------------------
 # Property & Room Info
 # -------------------------------
-properties = [...]  # (Same as original: room availability listing)
+properties = [
+    {"name": "The Grand Subang (SS15)", "location": "Subang", "units": [
+        {"unit_id": "Unit-1", "rooms": [
+            {"type": "Master Room", "price": 900, "occupied": False},
+            {"type": "Master Room", "price": 1050, "occupied": False},
+            {"type": "Small Room", "price": 400, "occupied": True},
+        ]},
+        {"unit_id": "Unit-2", "rooms": [
+            {"type": "Master Room", "price": 1200, "occupied": True},
+            {"type": "Medium Room", "price": 700, "occupied": False},
+        ]},
+        {"unit_id": "Unit-3", "rooms": [
+            {"type": "Medium Room", "price": 850, "occupied": False},
+            {"type": "Small Room", "price": 400, "occupied": False},
+        ]},
+        {"unit_id": "Unit-4", "rooms": [
+            {"type": "Master Room", "price": 1000, "occupied": False},
+            {"type": "Medium Room", "price": 800, "occupied": True},
+        ]},
+    ]},
+    {"name": "MH2 Platinium", "location": "Setapak", "units": [
+        {"unit_id": "Unit-1", "rooms": [
+            {"type": "Master Room", "price": 1150, "occupied": False},
+            {"type": "Medium Room", "price": 800, "occupied": True},
+        ]},
+        {"unit_id": "Unit-2", "rooms": [
+            {"type": "Small Room", "price": 400, "occupied": True},
+        ]},
+        {"unit_id": "Unit-3", "rooms": [
+            {"type": "Small Room", "price": 500, "occupied": True},
+            {"type": "Medium Room", "price": 650, "occupied": False},
+        ]},
+        {"unit_id": "Unit-4", "rooms": [
+            {"type": "Master Room", "price": 1000, "occupied": False},
+            {"type": "Medium Room", "price": 700, "occupied": True},
+        ]},
+    ]},
+    {"name": "The Hamilton", "location": "Wangsa Maju", "units": [
+        {"unit_id": "Unit-1", "rooms": [
+            {"type": "Master Room", "price": 1200, "occupied": False},
+            {"type": "Small Room", "price": 400, "occupied": False},
+        ]},
+        {"unit_id": "Unit-2", "rooms": [
+            {"type": "Medium Room", "price": 800, "occupied": False},
+            {"type": "Medium Room", "price": 700, "occupied": False},
+        ]},
+        {"unit_id": "Unit-3", "rooms": [
+            {"type": "Master Room", "price": 900, "occupied": True},
+            {"type": "Small Room", "price": 400, "occupied": False},
+        ]},
+        {"unit_id": "Unit-4", "rooms": [
+            {"type": "Medium Room", "price": 700, "occupied": True},
+        ]},
+    ]},
+]
 
 # -------------------------------
 # ALPS Scoring System
