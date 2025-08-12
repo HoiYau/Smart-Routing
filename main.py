@@ -1,9 +1,10 @@
+# main.py — Streamlit App for Smart Routing
 import streamlit as st
 import methods
 import uuid
 from datetime import datetime
 
-# Add new page in sidebar
+# Page configuration
 st.set_page_config(page_title="Smart Routing App", layout="wide")
 page = st.sidebar.radio("Navigate", ["Lead Scoring", "Available Rooms Dashboard", "Agent Load & Status"])
 
@@ -23,17 +24,15 @@ if page == "Lead Scoring":
 
     if submitted:
         score = methods.calculate_alps_score(budget, move_in_date, location, contact_provided, bedroom_type, user_type)
+        agent = methods.assign_lead_by_score(score)
 
-        # Advanced assignment with fallback by tier and balance within tier
-        if score >= 70:
-            agent = methods.assign_by_tier_priority(["Top", "Regular", "Junior"])
-            queue = "Senior Agent Queue"
-        elif score >= 40:
-            agent = methods.assign_by_tier_priority(["Regular", "Junior"])
-            queue = "Regular Agent Queue"
+        # Determine queue label based on score
+        if score >= 90:
+            queue = "Top Agent Queue"
+        elif score >= 80:
+            queue = "Shared Tier Queue (Top/Senior)"
         else:
-            agent = methods.assign_by_tier_priority(["Junior"])
-            queue = "General Inquiry Queue"
+            queue = "Cold Tier Queue (Senior/Junior)"
 
         st.success("Lead Processed")
         st.write(f"**Lead ID:** {lead_id}")
@@ -52,7 +51,7 @@ elif page == "Available Rooms Dashboard":
                     status = "✅ Available" if not room["occupied"] else "❌ Rented"
                     st.markdown(f"**Room {idx+1}**: {room['type']} - RM{room['price']} — {status}")
 
-# Agent Load & Status
+# Agent Load & Status Page
 elif page == "Agent Load & Status":
     st.title("\U0001F465 Agent Load & Status Overview")
     agents = methods.get_all_agents()
