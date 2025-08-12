@@ -1,56 +1,29 @@
-# methods.py — Enhanced Smart Routing Logic with Round-Robin Shared Tier
+# methods.py — Smart Routing Logic & Scoring Utilities
 from datetime import datetime
 
 # -------------------------------
-# Agent Profiles (Simulation)
+# Agent Profiles for Simulation
 # -------------------------------
 AGENT_POOL = [
     {"id": "Agent_S1", "name": "Emma Wilson", "role": "Property Specialist", "tier": "Top", "load": 0, "max_load": 5},
-    {"id": "Agent_R1", "name": "David Chen", "role": "Sales Consultant", "tier": "Senior", "load": 0, "max_load": 5},
-    {"id": "Agent_R2", "name": "Sarah Johnson", "role": "Customer Relations", "tier": "Senior", "load": 0, "max_load": 5},
-    {"id": "Agent_G1", "name": "Alex Rodriguez", "role": "Leasing Agent", "tier": "Junior", "load": 0, "max_load": 5},
-    {"id": "Agent_G2", "name": "Olivia Martinez", "role": "Junior Agent", "tier": "Junior", "load": 0, "max_load": 5},
+    {"id": "Agent_R1", "name": "David Chen", "role": "Sales Consultant", "tier": "Regular", "load": 0, "max_load": 5},
+    {"id": "Agent_R2", "name": "Sarah Johnson", "role": "Customer Relations", "tier": "Regular", "load": 0, "max_load": 5},
+    {"id": "Agent_R3", "name": "Alex Rodriguez", "role": "Leasing Agent", "tier": "Regular", "load": 0, "max_load": 5},
+    {"id": "Agent_G1", "name": "Olivia Martinez", "role": "Junior Agent", "tier": "Junior", "load": 0, "max_load": 5},
 ]
 
 # -------------------------------
-# Shared Tier Round-Robin Queue
+# Tiered Assignment Logic
 # -------------------------------
-SHARED_ROUND_ROBIN = ["David Chen", "Sarah Johnson", "Alex Rodriguez", "Olivia Martinez"]
-last_assigned_index = -1
-
-# -------------------------------
-# Lead Assignment Functions
-# -------------------------------
-def assign_lead_by_score(score):
-    if score >= 90:
-        return assign_by_tier("Top")
-    else:
-        return assign_by_shared_round_robin()
-
-
-def assign_by_tier(tier):
-    agents = [a for a in AGENT_POOL if a["tier"] == tier and a["load"] < a["max_load"]]
-    if agents:
-        selected = sorted(agents, key=lambda x: x["load"])[0]
-        selected["load"] += 1
-        update_agent_status(selected)
-        return selected["name"]
-    return None
-
-
-def assign_by_shared_round_robin():
-    global last_assigned_index
-    for i in range(len(SHARED_ROUND_ROBIN)):
-        idx = (last_assigned_index + 1 + i) % len(SHARED_ROUND_ROBIN)
-        agent_name = SHARED_ROUND_ROBIN[idx]
-        agent = next((a for a in AGENT_POOL if a["name"] == agent_name), None)
-        if agent and agent["load"] < agent["max_load"]:
+def assign_by_tier_priority(tiers):
+    for tier in tiers:
+        available = [a for a in AGENT_POOL if a["tier"].lower() == tier.lower() and a["load"] < a["max_load"]]
+        if available:
+            agent = sorted(available, key=lambda x: x["load"])[0]
             agent["load"] += 1
             update_agent_status(agent)
-            last_assigned_index = idx
             return agent["name"]
     return None
-
 
 def update_agent_status(agent):
     ratio = agent["load"] / agent["max_load"]
@@ -60,7 +33,6 @@ def update_agent_status(agent):
         agent["status"] = "Busy"
     else:
         agent["status"] = "Available"
-
 
 def get_all_agents():
     for agent in AGENT_POOL:
@@ -77,17 +49,8 @@ def get_all_agents():
         for agent in AGENT_POOL
     ]
 
-
-def reset_agent_load(agent_name):
-    global last_assigned_index
-    for agent in AGENT_POOL:
-        if agent["name"] == agent_name:
-            agent["load"] = 0
-            update_agent_status(agent)
-    last_assigned_index = -1
-
 # -------------------------------
-# Property & Room Info
+# Static Property & Room Data
 # -------------------------------
 properties = [
     {"name": "The Grand Subang (SS15)", "location": "Subang", "units": [
@@ -146,20 +109,19 @@ properties = [
 ]
 
 # -------------------------------
-# ALPS Scoring System
+# ALPS Scoring Functions
 # -------------------------------
 def urgency_score(move_in):
     days = (move_in - datetime.now().date()).days
     return 10 if days <= 4 else 8 if days <= 15 else 6 if days <= 30 else 3
 
-
 def count_room_type(location, room_type):
     return sum(
         1 for p in properties if p['location'] == location
         for u in p['units']
-        for r in u['rooms'] if not r['occupied'] and r['type'] == room_type
+        for r in u['rooms']
+        if not r['occupied'] and r['type'] == room_type
     )
-
 
 def room_type_score(location, room_type):
     total = sum(
@@ -170,10 +132,8 @@ def room_type_score(location, room_type):
     count = count_room_type(location, room_type)
     return round((count / total) * 10, 2) if total > 0 else 0
 
-
 def user_type_bonus(user_type):
     return 2 if user_type == "Employee" else 0
-
 
 def match_price_score(budget, location, room_type):
     matched = [r['price'] for p in properties if p['location'] == location for u in p['units'] for r in u['rooms'] if not r['occupied'] and r['type'] == room_type]
@@ -183,7 +143,6 @@ def match_price_score(budget, location, room_type):
     diff = abs(budget - closest) / closest
     return max(0, (1 - diff) * 20)
 
-
 def calculate_alps_score(budget, move_in, location, contact, room_type, user_type):
     score = urgency_score(move_in) * 4
     score += match_price_score(budget, location, room_type)
@@ -192,3 +151,11 @@ def calculate_alps_score(budget, move_in, location, contact, room_type, user_typ
     score += room_type_score(location, room_type)
     score += user_type_bonus(user_type)
     return round(min(score, 100), 2)
+
+def reset_agent_load(agent_name):
+    for agent in AGENT_POOL:
+        if agent["name"] == agent_name:
+            agent["load"] = 0
+            update_agent_status(agent)
+            break
+
