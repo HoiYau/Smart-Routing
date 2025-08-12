@@ -27,9 +27,9 @@ if page == "Lead Scoring":
         agent = methods.assign_lead_by_score(score)
 
         # Determine queue label based on score
-        if score >= 90:
+        if score >= 70:
             queue = "Top Agent Queue"
-        elif score >= 80:
+        elif score >= 60:
             queue = "Shared Tier Queue (Top/Senior)"
         else:
             queue = "Cold Tier Queue (Senior/Junior)"
