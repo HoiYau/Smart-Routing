@@ -1,4 +1,4 @@
-# methods.py — Enhanced Smart Routing Logic with Tiered Load Balancing & Fairness
+# methods.py — Enhanced Smart Routing Logic with Round-Robin Shared Tier
 from datetime import datetime
 
 # -------------------------------
@@ -13,13 +13,10 @@ AGENT_POOL = [
 ]
 
 # -------------------------------
-# Lead Routing Quotas by Tier
+# Shared Tier Round-Robin Queue
 # -------------------------------
-SHARED_TIER_QUOTA = {
-    "Top": 4,
-    "Senior": 3,
-    "Junior": 2
-}
+SHARED_ROUND_ROBIN = ["David Chen", "Sarah Johnson", "Alex Rodriguez", "Olivia Martinez"]
+last_assigned_index = -1
 
 # -------------------------------
 # Lead Assignment Functions
@@ -27,10 +24,8 @@ SHARED_TIER_QUOTA = {
 def assign_lead_by_score(score):
     if score >= 90:
         return assign_by_tier("Top")
-    elif score >= 80:
-        return assign_by_shared_tier(["Top", "Senior"])
     else:
-        return assign_by_shared_tier(["Senior", "Junior"])
+        return assign_by_shared_round_robin()
 
 
 def assign_by_tier(tier):
@@ -43,29 +38,17 @@ def assign_by_tier(tier):
     return None
 
 
-def assign_by_shared_tier(tiers):
-    eligible_agents = [
-        a for a in AGENT_POOL
-        if a["tier"] in tiers and a["load"] < a["max_load"]
-    ]
-
-    if not eligible_agents:
-        return None
-
-    # Group by tier
-    grouped = {tier: [] for tier in tiers}
-    for agent in eligible_agents:
-        grouped[agent["tier"]].append(agent)
-
-    # Select tier with available quota first
-    for tier in tiers:
-        if SHARED_TIER_QUOTA[tier] > 0 and grouped[tier]:
-            agent = sorted(grouped[tier], key=lambda x: x["load"])[0]
+def assign_by_shared_round_robin():
+    global last_assigned_index
+    for i in range(len(SHARED_ROUND_ROBIN)):
+        idx = (last_assigned_index + 1 + i) % len(SHARED_ROUND_ROBIN)
+        agent_name = SHARED_ROUND_ROBIN[idx]
+        agent = next((a for a in AGENT_POOL if a["name"] == agent_name), None)
+        if agent and agent["load"] < agent["max_load"]:
             agent["load"] += 1
             update_agent_status(agent)
-            SHARED_TIER_QUOTA[tier] -= 1
+            last_assigned_index = idx
             return agent["name"]
-
     return None
 
 
@@ -96,11 +79,12 @@ def get_all_agents():
 
 
 def reset_agent_load(agent_name):
+    global last_assigned_index
     for agent in AGENT_POOL:
         if agent["name"] == agent_name:
             agent["load"] = 0
             update_agent_status(agent)
-            break
+    last_assigned_index = -1
 
 # -------------------------------
 # Property & Room Info
