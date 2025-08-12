@@ -20,6 +20,7 @@ if page == "Lead Scoring":
         bedroom_type = st.selectbox("Room Type", ["Master Room", "Medium Room", "Small Room"])
         user_type = st.selectbox("I am a...", ["Employee", "Student"])
         message = st.text_area("Message")
+        reset_after_submit = st.checkbox("Reset agent loads after each lead (for testing)")
         submitted = st.form_submit_button("Process Lead")
 
     if submitted:
@@ -27,9 +28,9 @@ if page == "Lead Scoring":
         agent = methods.assign_lead_by_score(score)
 
         # Determine queue label based on score
-        if score >= 70:
+        if score >= 90:
             queue = "Top Agent Queue"
-        elif score >= 60:
+        elif score >= 80:
             queue = "Shared Tier Queue (Top/Senior)"
         else:
             queue = "Cold Tier Queue (Senior/Junior)"
@@ -39,6 +40,11 @@ if page == "Lead Scoring":
         st.write(f"**ALPS Score:** {score}/100")
         st.write(f"**Assigned Queue:** {queue}")
         st.write(f"**Assigned Agent:** {agent if agent else 'None Available'}")
+
+        if reset_after_submit:
+            for a in methods.AGENT_POOL:
+                methods.reset_agent_load(a["name"])
+            st.info("Agent loads have been reset.")
 
 # Available Rooms Dashboard
 elif page == "Available Rooms Dashboard":
@@ -82,3 +88,8 @@ elif page == "Agent Load & Status":
                 st.session_state["just_reset"] = True
 
         st.markdown("<hr>", unsafe_allow_html=True)
+
+    if st.button("Reset ALL agents"):
+        for a in methods.AGENT_POOL:
+            methods.reset_agent_load(a["name"])
+        st.success("All agents have been reset.")
